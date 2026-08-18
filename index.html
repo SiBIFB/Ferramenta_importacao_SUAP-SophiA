@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferramenta de importação em lote SUAP-SophiA</title>
+    <!-- Tailwind CSS para estilização moderna e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS (xlsx) para leitura e escrita de planilhas locais no navegador -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden">
+        <div class="bg-[#009660] p-6 text-white text-center">
+            <h1 class="text-2xl font-bold">Ferramenta de importação em lote SUAP-SophiA</h1>
+            <p class="text-emerald-100 text-sm mt-1">Automatize a padronização para inclusão e atualização de usuários</p>
+        </div>
+
+        <div class="p-8">
+            <form id="processorForm" class="space-y-6">
+                <!-- Modo de Operação -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Modo de Operação</label>
+                    <select id="modoOperacao" class="block w-full border border-gray-300 rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#009660] bg-white">
+                        <option value="inclusao">Apenas Inclusão (Novos Alunos)</option>
+                        <option value="atualizacao">Atualização (Alunos Existentes)</option>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-1">Escolha se deseja importar apenas os novos matriculados, ou se deseja atualizar as validades e inativar evasões na base existente.</p>
+                </div>
+
+                <!-- Arquivo 1: Planilha do SUAP -->
+                <div>
+                    <label id="labelSuapFile" class="block text-sm font-medium text-gray-700 mb-2">1. Planilha de Matriculados (SUAP)</label>
+                    <input type="file" id="suapFile" accept=".xls,.xlsx" required
+                        class="block w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-md file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-emerald-50 file:text-[#009660]
+                        hover:file:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-[#009660] rounded-md border border-gray-300 p-2">
+                    <p id="filterHelpSuap" class="text-xs text-gray-500 mt-2 font-medium">Planilha advinda de exportação com os seguintes filtros ativados na pesquisa de Alunos no SUAP:<br>Ano de Ingresso = ano vigente ; Período de Ingresso = período vigente ; Situação = Matriculado ; Campus = Campus da Biblioteca</p>
+                </div>
+
+                <!-- Arquivo 2: Planilha de Referência -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">2. Lista de Cursos e Tipos de Usuários</label>
+                    <input type="file" id="refFile" accept=".xlsx" required
+                        class="block w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-md file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-emerald-50 file:text-[#009660]
+                        hover:file:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-[#009660] rounded-md border border-gray-300 p-2">
+                    <p class="text-xs text-gray-400 mt-1 flex flex-col gap-1">
+                        <span><a href="https://docs.google.com/spreadsheets/d/1w8KSnbJsizlbGHb66iPgCNiHFL3oDk3O/edit?usp=sharing&ouid=100505125267656218120&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer" class="text-[#009660] hover:text-[#007a4e] hover:underline font-medium transition-colors">Ex: Lista cursos e Tipo usuário Biblioteca X.xlsx</a></span>
+                        <span>(Colunas esperadas: A=Curso SUAP, B=Curso SophiA, C=Tipo de Usuário, D=Importar? (SIM/NÃO))</span>
+                    </p>
+                </div>
+
+                <!-- Campo de Texto: Nome da Biblioteca -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">3. Nome da Biblioteca</label>
+                    <input type="text" id="nomeBiblioteca" placeholder="Ex: Biblioteca Gama" required
+                        class="block w-full border border-gray-300 rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#009660]">
+                    <p class="text-xs text-gray-400 mt-1">Nome da biblioteca exatamente como deve constar no cadastro do SophiA.</p>
+                </div>
+
+                <!-- Campo de Texto: Data de Validade -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">4. Data de Validade</label>
+                    <input type="text" id="dataValidade" placeholder="Ex: 19/02/2027" required
+                        class="block w-full border border-gray-300 rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#009660]">
+                    <p class="text-xs text-gray-400 mt-1">Data de expiração do cadastro (formato DD/MM/AAAA) aplicada aos usuários ativos.</p>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-[#009660] text-white font-bold py-3 px-4 rounded-md hover:bg-[#007a4e] transition duration-300 flex justify-center items-center">
+                    <span>Processar e Baixar Arquivo TXT</span>
+                </button>
+
+                <!-- Caixa de mensagens para erros ou sucesso movida para baixo do botão -->
+                <div id="messageBox" class="hidden p-4 rounded-lg font-medium text-sm"></div>
+            </form>
+
+            <!-- Aviso Importante SophiA -->
+            <div class="mt-8 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-md text-amber-800 text-sm shadow-sm">
+                <p class="font-bold flex items-center mb-2">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    ATENÇÃO: Configuração na Importação do SophiA
+                </p>
+                <p>A ordem dos campos na ferramenta de importação do sistema SophiA deve ser <strong>obrigatoriamente</strong> a seguinte para o modo selecionado:</p>
+                
+                <!-- Lista para Apenas Inclusão -->
+                <div id="listaInclusao" class="mt-3 bg-amber-100/80 p-3 rounded text-amber-900 border border-amber-200/50 text-sm font-mono font-medium flex flex-col gap-2">
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">1. Nome;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">2. Matrícula;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">3. Curso;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">4. Tipo de usuário;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">5. Biblioteca;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">6. Contato residencial - E-mail;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">7. Data de validade;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">8. Inativo.</div>
+                </div>
+
+                <!-- Lista para Atualização -->
+                <div id="listaAtualizacao" class="hidden mt-3 bg-amber-100/80 p-3 rounded text-amber-900 border border-amber-200/50 text-sm font-mono font-medium flex flex-col gap-2">
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">1. Nome;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">2. Matrícula;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">3. Curso;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">4. Tipo de usuário;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">5. Biblioteca;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">6. Data de validade;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">7. Inativo.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gray-50 p-4 border-t border-gray-200 text-xs text-gray-500">
+            <strong>O que o sistema fará:</strong> Filtra apenas os cursos marcados com "SIM" na 4ª coluna da planilha de referência. 
+            <span id="explicacaoInclusao"><strong>No modo Inclusão:</strong> Cria o arquivo contendo o e-mail do aluno, preenche a validade informada no formulário e define a situação como ativa (0).</span>
+            <span id="explicacaoAtualizacao" class="hidden"><strong>No modo Atualização:</strong> Analisa a base geral do SUAP. Oculta o e-mail no arquivo TXT para evitar sobreposições no SophiA (7 colunas). Apenas alunos com a situação exata de 'Matriculado' recebem a nova Data de Validade e status '0' (Ativo). Todas as demais situações, incluindo 'Transferido internamente', ficam com a validade em branco e status '1' (Inativo).</span>
+            <br><br><strong>O resultado será um arquivo .TXT, codificado em UTF-8, separado por ponto e vírgula e sem cabeçalho.</strong>
+        </div>
+    </div>
+
+    <script>
+        // Função utilitária para ler o arquivo como ArrayBuffer (necessário para o SheetJS)
+        function readFileAsArrayBuffer(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(e);
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Função auxiliar para normalizar texto e evitar quebra de strings (remove espaços extras e capitaliza)
+        const normalizeStr = (str) => {
+            if (str === null || str === undefined) return "";
+            return String(str).trim().replace(/\s+/g, ' ').toUpperCase();
+        };
+
+        // Função para exibir mensagens na interface
+        function showMessage(msg, isError = false) {
+            const box = document.getElementById('messageBox');
+            box.innerHTML = msg; // Permite HTML interno
+            box.className = `p-4 rounded-lg text-sm ${isError ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'}`;
+            box.classList.remove('hidden');
+        }
+
+        // Alternar visualização da lista de campos dependendo do modo selecionado
+        document.getElementById('modoOperacao').addEventListener('change', function(e) {
+            const isAtualizacao = e.target.value === 'atualizacao';
+            document.getElementById('listaInclusao').classList.toggle('hidden', isAtualizacao);
+            document.getElementById('listaAtualizacao').classList.toggle('hidden', !isAtualizacao);
+            
+            // Alternar texto explicativo do rodapé
+            document.getElementById('explicacaoInclusao').classList.toggle('hidden', isAtualizacao);
+            document.getElementById('explicacaoAtualizacao').classList.toggle('hidden', !isAtualizacao);
+            
+            // Alterar dinamicamente os textos do campo do arquivo 1
+            const labelSuap = document.getElementById('labelSuapFile');
+            const filterHelpSuap = document.getElementById('filterHelpSuap');
+            
+            if (isAtualizacao) {
+                labelSuap.innerText = "1. Planilha Geral de Alunos (SUAP)";
+                filterHelpSuap.innerHTML = "Planilha advinda de exportação com os seguintes filtros ativados na pesquisa de Alunos no SUAP:<br>Ano de Ingresso = Todos ; Período de Ingresso = Todos ; Situação = Todos ; Campus = Campus da Biblioteca";
+            } else {
+                labelSuap.innerText = "1. Planilha de Matriculados (SUAP)";
+                filterHelpSuap.innerHTML = "Planilha advinda de exportação com os seguintes filtros ativados na pesquisa de Alunos no SUAP:<br>Ano de Ingresso = ano vigente ; Período de Ingresso = período vigente ; Situação = Matriculado ; Campus = Campus da Biblioteca";
+            }
+        });
+
+        document.getElementById('processorForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            const originalBtnText = btn.innerHTML;
+            btn.innerHTML = '<span class="animate-pulse">Processando...</span>';
+            btn.disabled = true;
+            document.getElementById('messageBox').classList.add('hidden');
+
+            try {
+                // Obtendo os valores do formulário
+                const modoOperacao = document.getElementById('modoOperacao').value;
+                const suapFile = document.getElementById('suapFile').files[0];
+                const refFile = document.getElementById('refFile').files[0];
+                const nomeBiblioteca = document.getElementById('nomeBiblioteca').value.trim();
+                const dataValidade = document.getElementById('dataValidade').value.trim();
+
+                // 1. Ler e processar a planilha de referência (Dicionário)
+                const refBuffer = await readFileAsArrayBuffer(refFile);
+                const refWorkbook = XLSX.read(refBuffer, { type: 'array' });
+                const refSheet = refWorkbook.Sheets[refWorkbook.SheetNames[0]];
+                
+                const refRows = XLSX.utils.sheet_to_json(refSheet, { header: 1 });
+                
+                const courseMap = {};
+                for (let i = 1; i < refRows.length; i++) { // Pula cabeçalho
+                    const row = refRows[i];
+                    if (row.length > 0) {
+                        const suapName = row[0] ? row[0].toString().trim() : "";
+                        if (!suapName) continue;
+                        
+                        const correctName = row[1] ? row[1].toString().trim() : suapName;
+                        const userType = row[2] ? row[2].toString().trim() : "";
+                        const importarStr = row[3] ? row[3].toString().trim().toUpperCase() : "NÃO";
+                        const importar = (importarStr === "SIM");
+
+                        courseMap[normalizeStr(suapName)] = { 
+                            nomeCorreto: correctName, 
+                            tipoUsuario: userType,
+                            importar: importar
+                        };
+                    }
+                }
+
+                // 2. Ler a planilha principal (SUAP)
+                const suapBuffer = await readFileAsArrayBuffer(suapFile);
+                const suapWorkbook = XLSX.read(suapBuffer, { type: 'array', cellText: false, cellDates: true });
+                const suapSheet = suapWorkbook.Sheets[suapWorkbook.SheetNames[0]];
+                
+                const mainRows = XLSX.utils.sheet_to_json(suapSheet, { header: 1, raw: false });
+                
+                if (mainRows.length === 0) throw new Error("A planilha do SUAP está vazia.");
+
+                const headers = mainRows[0].map(c => c ? c.toString().trim() : "");
+                
+                const getIdx = (variations) => {
+                    for (let v of variations) {
+                        const idx = headers.findIndex(h => normalizeStr(h) === normalizeStr(v));
+                        if (idx !== -1) return idx;
+                    }
+                    return -1;
+                };
+
+                const idxNome = getIdx(["Nome", "Nome do aluno"]);
+                const idxMatricula = getIdx(["Matrícula", "Matricula"]);
+                const idxCurso = getIdx(["Curso"]);
+                const idxEmail = getIdx(["E-mail pessoal", "E-mail pessoa", "Email pessoal", "E-mail"]);
+                const idxSituacao = getIdx(["Situação", "Situacao", "Situação no Curso"]);
+
+                if (idxCurso === -1) throw new Error("Coluna 'Curso' não encontrada na planilha do SUAP.");
+                if (modoOperacao === 'atualizacao' && idxSituacao === -1) {
+                    throw new Error("Coluna 'Situação' não encontrada na planilha do SUAP. Obrigatória para Atualização.");
+                }
+
+                const newRows = [];
+                let contAlunos = 0;
+
+                for (let i = 1; i < mainRows.length; i++) {
+                    const oldRow = mainRows[i];
+                    if (oldRow.length === 0 || (!oldRow[0] && oldRow.length === 1)) continue;
+
+                    const getCell = (idx) => (idx !== -1 && idx < oldRow.length && oldRow[idx] !== undefined) ? oldRow[idx] : "";
+
+                    let nome = getCell(idxNome);
+                    let matricula = getCell(idxMatricula);
+                    let originalCourse = getCell(idxCurso);
+                    let email = getCell(idxEmail);
+                    let situacao = getCell(idxSituacao);
+
+                    let searchKey = normalizeStr(originalCourse);
+                    let mappedData = courseMap[searchKey];
+
+                    // Filtro de Importação (Só passa se tiver SIM na coluna D)
+                    if (!mappedData || !mappedData.importar) continue;
+
+                    if (modoOperacao === 'inclusao') {
+                        newRows.push([
+                            nome,
+                            matricula,
+                            mappedData.nomeCorreto,
+                            mappedData.tipoUsuario,
+                            nomeBiblioteca,
+                            email,
+                            String(dataValidade),
+                            "0"
+                        ]);
+                        contAlunos++;
+                    } else if (modoOperacao === 'atualizacao') {
+                        let sitNorm = normalizeStr(situacao);
+                        let isAtivo = (sitNorm === "MATRICULADO"); // Apenas matriculado fica ativo e ganha validade
+                        
+                        let validadeFinal = isAtivo ? String(dataValidade) : "";
+                        let inativoFinal = isAtivo ? "0" : "1"; // Se não for matriculado, inativa
+
+                        newRows.push([
+                            nome,
+                            matricula,
+                            mappedData.nomeCorreto,
+                            mappedData.tipoUsuario,
+                            nomeBiblioteca,
+                            validadeFinal,
+                            inativoFinal
+                        ]);
+                        contAlunos++;
+                    }
+                }
+                
+                if (contAlunos === 0) {
+                    throw new Error("Nenhum aluno atendeu aos critérios. Verifique se os cursos do SUAP estão marcados com 'SIM' na planilha de referência.");
+                }
+
+                let txtContent = "";
+                for (let row of newRows) {
+                    let formattedRow = row.map(field => {
+                        let strField = String(field || "");
+                        // Trocar ponto e vírgula por vírgula dentro do texto para não quebrar as colunas
+                        return strField.replace(/;/g, ',');
+                    });
+                    txtContent += formattedRow.join(";") + "\r\n"; // Fim de linha com CR LF
+                }
+                
+                // Forçar codificação UTF-8
+                const blob = new Blob(["\uFEFF" + txtContent], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", "Importacao_SophiA.txt");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showMessage(`<strong>Sucesso!</strong><br>Arquivo TXT gerado e baixado com sucesso!<br>${contAlunos} aluno(s) foram processados e adicionados.`, false);
+
+            } catch (error) {
+                console.error(error);
+                showMessage("<strong>Erro:</strong> " + error.message, true);
+            } finally {
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
