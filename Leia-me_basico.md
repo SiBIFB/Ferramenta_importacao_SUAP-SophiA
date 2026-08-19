@@ -46,11 +46,11 @@ Dica: mantenha cópias originais dos arquivos antes de processar. 🗂️
 
 ## 🖱️ Passo a passo (guia para iniciantes)
 
-1. Abra o arquivo `index.html` no navegador (Chrome, Edge ou Firefox funcionam bem). Basta localizar o arquivo na pasta e dar dois cliques nele.
+1. Abra a página da ferramenta ( https://sibifb.github.io/Ferramenta_importacao_SUAP-SophiA/ ) no navegador (Chrome, Edge ou Firefox funcionam bem).
 
 2. Em "Modo de Operação", escolha:
-   - "Apenas Inclusão (Novos Alunos)" — use quando for criar cadastros novos.
-   - "Atualização (Alunos Existentes)" — use quando for atualizar validade e inativar alunos que não estão matriculados.
+   - "Apenas Inclusão (Novos Alunos)" — use quando for criar cadastros novos todo semestre, por exemplo.
+   - "Atualização (Alunos Existentes)" — use quando for atualizar validade dos alunos devidamente matriculados e inativar alunos que não estão matriculados (trancados, evadidos, etc).
 
 3. Em **1. Planilha de Matriculados (SUAP)** clique em "Escolher ficheiro" e selecione a exportação do SUAP (.xls ou .xlsx).
 
