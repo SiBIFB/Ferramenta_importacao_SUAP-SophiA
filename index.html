@@ -319,8 +319,8 @@
                     txtContent += formattedRow.join(";") + "\r\n"; // Fim de linha com CR LF
                 }
                 
-                // Forçar codificação UTF-8
-                const blob = new Blob(["\uFEFF" + txtContent], { type: 'text/plain;charset=utf-8' });
+                // Gerar arquivo TXT em UTF-8 padrão (Sem BOM para evitar erros de leitura no primeiro caractere no SophiA)
+                const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 
                 const link = document.createElement("a");
