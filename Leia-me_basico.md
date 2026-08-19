@@ -60,20 +60,20 @@ Dica: mantenha cópias originais dos arquivos antes de processar. 🗂️
      - Ano de Ingresso: selecione o ano vigente (ou o ano do ingresso que você quer importar)
      - Período de Ingresso: selecione o período vigente (se aplicável)
      - Situação: Matriculado (para trazer apenas alunos ativos que serão incluídos)
-     - Campus/Unidade: selecione o campus correspondente à biblioteca (se desejar filtrar por campus)
-     - Observação: o objetivo aqui é exportar somente os alunos que se deseja criar no SophiA — obtenha uma lista enxuta para evitar inclusões indevidas.
+     - Campus/Unidade: selecione o campus correspondente à biblioteca
+     - Observação: o objetivo aqui é exportar somente os novos alunos que se deseja criar no SophiA — obtenha uma lista enxuta para evitar inclusões indevidas.
 
    - Filtros recomendados para o modo "Atualização (Alunos Existentes)":
      - Ano de Ingresso: Todos (ou deixe sem filtro) — você deseja a base geral para atualizar validade/inativar
      - Período de Ingresso: Todos (ou deixe sem filtro)
-     - Situação: incluir todos (Matriculado, Trancado, Evasão, etc.) — a coluna Situação será usada para decidir validade/inativação
-     - Campus/Unidade: selecione o campus correspondente à biblioteca (para limitar a base se necessário)
-     - Observação: exporte a base completa ou a fatia desejada, pois a ferramenta usará o campo Situação para decidir quem permanece ativo.
+     - Situação: incluir todos, i.e., sem fltro (Matriculado, Trancado, Evasão, etc.) — a coluna Situação será usada para decidir validade/inativação
+     - Campus/Unidade: selecione o campus correspondente à biblioteca
+     - Observação: exporte a base completa ou a fatia desejada, pois a ferramenta usará o campo Situação para decidir quem permanece ativo e recebe renova data de validade.
 
 4. Em **2. Lista de Cursos e Tipos de Usuários** clique em "Escolher ficheiro" e selecione a planilha de referência (.xlsx). A planilha deve ter:
-   - Coluna A: Curso SUAP (ex.: "Administração")
-   - Coluna B: Curso SophiA (ex.: "ADMINISTRACAO")
-   - Coluna C: Tipo de Usuário (ex.: "Aluno")
+   - Coluna A: Curso com nome no SUAP
+   - Coluna B: Curso com nome padronizado no SophiA
+   - Coluna C: Tipo de Usuário (ex.: "Ensino Médio Integrado") de acordo com o oficial SophiA
    - Coluna D: Importar? (SIM ou NÃO)
 
 5. Em **3. Nome da Biblioteca**, digite o nome exatamente como deve aparecer no SophiA (ex.: "Biblioteca Gama").
@@ -82,7 +82,7 @@ Dica: mantenha cópias originais dos arquivos antes de processar. 🗂️
 
 7. Clique em **Processar e Baixar Arquivo TXT**. Aguarde a mensagem de sucesso.
 
-- Se tudo funcionar, o navegador fará o download do arquivo `Importacao_SophiA.txt`.
+- Se tudo funcionar, aparecerá uma mensagem de sucesso e o navegador fará o download do arquivo `Importacao_SophiA.txt`.
 - Se houver problema, aparecerá uma mensagem de erro em vermelho explicando (veja seção "Resolução de problemas").
 
 ---
@@ -117,7 +117,7 @@ Observação: a ordem é importante — siga exatamente como o SophiA exige. �
 ## 🧾 Formato do arquivo gerado
 
 - Nome: `Importacao_SophiA.txt`
-- Codificação: UTF-8 (com BOM) — para evitar problemas de acentuação
+- Codificação: UTF-8 — para evitar problemas de acentuação
 - Separador: ponto e vírgula (`;`)
 - Fim de linha: CRLF (compatível com sistemas do SophiA)
 - Sem cabeçalho — somente linhas de dados
