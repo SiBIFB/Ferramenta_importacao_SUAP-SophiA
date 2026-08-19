@@ -78,7 +78,7 @@ Importante: a ordem e o número de colunas do TXT devem respeitar o que o SophiA
 ## Formato do arquivo de saída
 
 - Nome do arquivo: Importacao_SophiA.txt
-- Codificação: UTF-8 com BOM (a página inclui o marcador U+FEFF)
+- Codificação: UTF-8
 - Separador de campo: ponto e vírgula (`;`)
 - Final de linha: CRLF (\r\n)
 - Sem cabeçalho (apenas linhas de dados)
