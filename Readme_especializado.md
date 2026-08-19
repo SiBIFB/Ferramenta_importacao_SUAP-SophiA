@@ -15,7 +15,7 @@ Fluxo resumido:
 1. Ler planilha de referência (.xlsx) e construir um mapa (courseMap) onde a chave é o nome do curso normalizado do SUAP e o valor contém: nome convertido para SophiA, tipo de usuário e flag `importar` (boolean).
 2. Ler planilha exportada do SUAP (.xls/.xlsx). Detectar a linha de cabeçalho (assumida como a primeira linha) e localizar os índices de colunas relevantes por comparação com uma lista de variações de nomes.
 3. Iterar sobre linhas de dados, normalizar nomes de curso, consultar `courseMap`, filtrar por `importar === true` e montar as linhas de saída conforme o modo (inclusão/atualização).
-4. Gerar conteúdo TXT (UTF-8 com BOM), substituindo `;` internos por `,` e juntando colunas com `;`. Baixar o arquivo via Blob e URL.createObjectURL.
+4. Gerar conteúdo TXT (UTF-8), substituindo `;` internos por `,` e juntando colunas com `;`. Baixar o arquivo via Blob e URL.createObjectURL.
 
 ---
 
@@ -54,7 +54,7 @@ Trechos-chave e comportamento:
 - Geração do TXT:
   - Antes de concatenar, campos internos com `;` são convertidos para `,` para não quebrar o separador.
   - Linha terminada com CRLF (`\r\n`).
-  - Blob criado com `"\uFEFF" + txtContent` (BOM) e tipo `text/plain;charset=utf-8`.
+  - Blob criado com tipo `text/plain;charset=utf-8`.
 
 ---
 
@@ -66,7 +66,7 @@ Trechos-chave e comportamento:
 4. Datas: o campo Data de Validade é tratado como string fornecida pelo usuário (form input). Não há validação de formato. Recomenda-se implementar validação/parse com regex (ex.: `/^\d{2}\/\d{2}\/\d{4}$/`) e conversão para formato interno.
 5. E-mails: no modo `inclusao` o e-mail é incluído sem validação. Pode ser útil validar sintaxe básica com regex.
 6. Grandes planilhas: leitura inteira em memória. Para milhares de linhas o navegador pode consumir muita memória; testar limites no navegador alvo.
-7. Encodings: o uso de BOM (`\uFEFF`) ajuda o SophiA a reconhecer UTF-8; porém alguns sistemas podem interpretar BOM como caractere adicional. Testar no ambiente SophiA local.
+7. Encodings: UTF-8.
 
 ---
 
@@ -184,9 +184,6 @@ Isso facilita auditoria e rastreabilidade quando importando em produção.
 ---
 
 ## 🧩 FAQ técnica rápida
-
-Q: Por que há um BOM (\uFEFF) no começo do arquivo?
-A: Para aumentar compatibilidade com importadores que esperam UTF-8 e que possam interpretar corretamente acentuação.
 
 Q: Por que alguns cursos não são processados mesmo estando na referência?
 A: Diferença de normalização (acentos, símbolos, múltiplos espaços) ou erro de mapeamento (coluna D = NÃO). Verifique `normalizeStr` e a presença de `SIM`.
