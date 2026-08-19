@@ -1,6 +1,6 @@
 # 📚 Ferramenta de importação em lote SUAP → SophiA
 
-> Uma pequena ferramenta que roda no navegador para transformar planilhas exportadas do SUAP em um arquivo .TXT pronto para importação no sistema SophiA — pensada para bibliotecários e auxiliares que precisam atualizar/adiicionar cadastros em lote, sem precisar programar. ✅
+> Uma pequena ferramenta que roda no navegador para transformar planilhas exportadas do SUAP em um arquivo .TXT pronto para importação no sistema SophiA — pensada para bibliotecários e auxiliares que precisam atualizar/adicionar cadastros em lote, sem precisar programar. ✅
 
 ---
 
@@ -53,6 +53,22 @@ Dica: mantenha cópias originais dos arquivos antes de processar. 🗂️
    - "Atualização (Alunos Existentes)" — use quando for atualizar validade e inativar alunos que não estão matriculados.
 
 3. Em **1. Planilha de Matriculados (SUAP)** clique em "Escolher ficheiro" e selecione a exportação do SUAP (.xls ou .xlsx).
+
+   ➤ Importante — Campos/filtragem a selecionar no SUAP antes de exportar
+
+   - Filtros recomendados para o modo "Apenas Inclusão (Novos Alunos)":
+     - Ano de Ingresso: selecione o ano vigente (ou o ano do ingresso que você quer importar)
+     - Período de Ingresso: selecione o período vigente (se aplicável)
+     - Situação: Matriculado (para trazer apenas alunos ativos que serão incluídos)
+     - Campus/Unidade: selecione o campus correspondente à biblioteca (se desejar filtrar por campus)
+     - Observação: o objetivo aqui é exportar somente os alunos que se deseja criar no SophiA — obtenha uma lista enxuta para evitar inclusões indevidas.
+
+   - Filtros recomendados para o modo "Atualização (Alunos Existentes)":
+     - Ano de Ingresso: Todos (ou deixe sem filtro) — você deseja a base geral para atualizar validade/inativar
+     - Período de Ingresso: Todos (ou deixe sem filtro)
+     - Situação: incluir todos (Matriculado, Trancado, Evasão, etc.) — a coluna Situação será usada para decidir validade/inativação
+     - Campus/Unidade: selecione o campus correspondente à biblioteca (para limitar a base se necessário)
+     - Observação: exporte a base completa ou a fatia desejada, pois a ferramenta usará o campo Situação para decidir quem permanece ativo.
 
 4. Em **2. Lista de Cursos e Tipos de Usuários** clique em "Escolher ficheiro" e selecione a planilha de referência (.xlsx). A planilha deve ter:
    - Coluna A: Curso SUAP (ex.: "Administração")
