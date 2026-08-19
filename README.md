@@ -1,108 +1,164 @@
-# Ferramenta de importação em lote SUAP-SophiA
+# 📚 Ferramenta de importação em lote SUAP → SophiA
 
-Ferramenta simples baseada em página HTML que roda diretamente no navegador para gerar arquivos de importação compatíveis com o sistema SophiA a partir de exportações do SUAP.
-
-A aplicação permite processar em lote listas de alunos (exportadas do SUAP) usando uma planilha de referência que mapeia os cursos SUAP para os cursos e tipos de usuário esperados pelo SophiA. O resultado é um arquivo .TXT (UTF-8) pronto para importação no SophiA.
-
-## Funcionalidades
-
-- Processamento em modo "Inclusão" (cria registros para novos alunos).
-- Processamento em modo "Atualização" (atualiza validade e inativa alunos não matriculados).
-- Utiliza uma planilha de referência para mapear nomes de curso e determinar quais cursos importar.
-- Gera arquivo .TXT separado por ponto e vírgula (;) com codificação UTF-8 (com BOM) e final de linha CRLF.
-- Roda 100% no cliente (navegador) — sem back-end.
-
-## Dependências
-
-A página carrega bibliotecas via CDN:
-- Tailwind CSS (estilização)
-- SheetJS (xlsx) para leitura das planilhas Excel
-
-É necessário que o navegador tenha acesso à internet para carregar as dependências se estiver usando diretamente o arquivo `index.html` sem bundler.
-
-## Arquivos de entrada esperados
-
-1) Planilha de Matriculados (exportação do SUAP)
-- Formato: .xls ou .xlsx
-- A primeira linha é tratada como cabeçalho — a ferramenta tenta localizar colunas por nomes comuns.
-- Colunas relevantes (a serem encontradas na exportação do SUAP):
-  - Nome (ex.: "Nome", "Nome do aluno")
-  - Matrícula (ex.: "Matrícula", "Matricula")
-  - Curso (ex.: "Curso") — obrigatório
-  - E-mail (ex.: "E-mail pessoal", "Email pessoal") — usado apenas no modo Inclusão
-  - Situação (ex.: "Situação", "Situação no Curso") — obrigatório no modo Atualização
-
-2) Planilha de Referência (mapeamento de cursos)
-- Formato: .xlsx
-- Colunas esperadas (linha de dados a partir da 2ª linha; a 1ª linha pode ser cabeçalho):
-  - A = Curso SUAP (valor buscado na exportação do SUAP)
-  - B = Curso SophiA (nome a ser escrito no arquivo de saída)
-  - C = Tipo de Usuário (ex.: Aluno, Servidor, etc.)
-  - D = Importar? (SIM/NÃO) — somente cursos com "SIM" serão processados
-
-Observação: a chave usada para correspondência é a versão normalizada (sem espaços extras e em maiúsculas) do nome do curso na coluna A.
-
-## Como usar (passo a passo)
-
-1. Abra o arquivo `index.html` no navegador (ou hospede a página estática).
-2. Selecione o modo de operação: "Apenas Inclusão (Novos Alunos)" ou "Atualização (Alunos Existentes)".
-3. Carregue a planilha exportada do SUAP (.xls/.xlsx).
-4. Carregue a planilha de referência (.xlsx) que contém o mapeamento de cursos.
-5. Preencha o nome da biblioteca exatamente como deve aparecer no cadastro do SophiA.
-6. Informe a data de validade que será aplicada aos usuários ativos (formato DD/MM/AAAA).
-7. Clique em "Processar e Baixar Arquivo TXT" para gerar e baixar o arquivo `Importacao_SophiA.txt`.
-
-## Diferenças entre os modos
-
-- Inclusão (inclusao): o TXT gerado contém as colunas na ordem exigida pelo SophiA para inclusão:
-  1. Nome
-  2. Matrícula
-  3. Curso (nome convertido pelo mapeamento)
-  4. Tipo de usuário
-  5. Biblioteca
-  6. Contato residencial - E-mail
-  7. Data de validade (DD/MM/AAAA)
-  8. Inativo (0 = ativo)
-
-- Atualização (atualizacao): o TXT gerado contém campos voltados à atualização de validade e inativação:
-  1. Nome
-  2. Matrícula
-  3. Curso (nome convertido pelo mapeamento)
-  4. Tipo de usuário
-  5. Biblioteca
-  6. Data de validade (preenchida apenas se o aluno estiver "MATRICULADO")
-  7. Inativo (0 = ativo, 1 = inativo)
-
-Importante: a ordem e o número de colunas do TXT devem respeitar o que o SophiA espera — ver o aviso dentro da interface.
-
-## Formato do arquivo de saída
-
-- Nome do arquivo: Importacao_SophiA.txt
-- Codificação: UTF-8
-- Separador de campo: ponto e vírgula (`;`)
-- Final de linha: CRLF (\r\n)
-- Sem cabeçalho (apenas linhas de dados)
-
-## Tratamento de erros e mensagens
-
-- Se nenhuma linha for processada, a ferramenta exibirá uma mensagem de erro indicando que nenhum aluno atendeu aos critérios (verifique as marcações "SIM" na planilha de referência).
-- Verifique se as colunas obrigatórias (especialmente `Curso` e, no modo Atualização, `Situação`) estão presentes e corretamente nomeadas na exportação do SUAP.
-
-## Segurança e privacidade
-
-- A ferramenta roda localmente no navegador e não envia dados a servidores externos.
-- Ainda assim, os dados carregados ficam disponíveis apenas na sessão do navegador — recomenda-se apagar arquivos e histórico quando necessário.
-
-## Exemplos e sugestão de fluxo
-
-- Gere a exportação de Alunos no SUAP com filtros apropriados (por exemplo: Ano de ingresso = ano vigente; Situação = Matriculado; Campus = campus da biblioteca).
-- Monte a planilha de referência mapeando somente os cursos que você deseja importar e marque "SIM" na coluna D.
-- Abra a página, carregue os arquivos, confirme a data de validade e execute o processamento.
-
-## Licença
-
-- MIT — sinta-se à vontade para adaptar a ferramenta para sua realidade.
+> Uma pequena ferramenta que roda no navegador para transformar planilhas exportadas do SUAP em um arquivo .TXT pronto para importação no sistema SophiA — pensada para bibliotecários e auxiliares que precisam atualizar/adiicionar cadastros em lote, sem precisar programar. ✅
 
 ---
 
-Para mais detalhes, abra o `index.html` e leia os comentários no código fonte.
+## 🎯 Objetivo
+
+Gerar, localmente no navegador, um arquivo de importação (.TXT) formatado para o SophiA a partir de duas planilhas:
+
+- Exportação do SUAP com os alunos;
+- Planilha de referência que mapeia nomes de curso do SUAP para os nomes e tipos de usuário esperados pelo SophiA.
+
+A ferramenta não envia dados à internet — tudo roda no seu computador.
+
+---
+
+## 🧭 Visão geral do que você precisa
+
+1. Arquivo exportado do SUAP (.xls ou .xlsx) — lista de alunos.
+2. Planilha de referência (.xlsx) — mapeamento de cursos e indicação se devem ser importados.
+3. Nome da biblioteca (texto) — exatamente como aparece no SophiA.
+4. Data de validade (DD/MM/AAAA) — será aplicada aos usuários ativos.
+
+---
+
+## ⚠️ Antes de começar — checagem rápida (checklist)
+
+- [ ] Você tem a exportação do SUAP (xls/xlsx).
+- [ ] Você tem a planilha de referência com as colunas: A=Curso SUAP, B=Curso SophiA, C=Tipo de Usuário, D=Importar? (SIM/NÃO).
+- [ ] O navegador pode abrir o arquivo `index.html` (clique duas vezes nele ou hospede em servidor estático).
+- [ ] Tenha em mãos o nome exato da biblioteca como consta no SophiA.
+
+Dica: mantenha cópias originais dos arquivos antes de processar. 🗂️
+
+---
+
+## 📝 Como funciona (resumo simples)
+
+1. A ferramenta lê a planilha de referência e cria um “dicionário” que traduz os nomes dos cursos do SUAP para os nomes usados no SophiA.
+2. Abre a planilha do SUAP, encontra as colunas necessárias (Nome, Matrícula, Curso, E-mail, Situação).
+3. Para cada aluno, se o curso estiver marcado como "SIM" na planilha de referência, a linha é preparada para o SophiA.
+4. O resultado é um arquivo `Importacao_SophiA.txt` em UTF-8; separado por ponto-e-vírgula (`;`) e sem cabeçalho.
+
+---
+
+## 🖱️ Passo a passo (guia para iniciantes)
+
+1. Abra o arquivo `index.html` no navegador (Chrome, Edge ou Firefox funcionam bem). Basta localizar o arquivo na pasta e dar dois cliques nele.
+
+2. Em "Modo de Operação", escolha:
+   - "Apenas Inclusão (Novos Alunos)" — use quando for criar cadastros novos.
+   - "Atualização (Alunos Existentes)" — use quando for atualizar validade e inativar alunos que não estão matriculados.
+
+3. Em **1. Planilha de Matriculados (SUAP)** clique em "Escolher ficheiro" e selecione a exportação do SUAP (.xls ou .xlsx).
+
+4. Em **2. Lista de Cursos e Tipos de Usuários** clique em "Escolher ficheiro" e selecione a planilha de referência (.xlsx). A planilha deve ter:
+   - Coluna A: Curso SUAP (ex.: "Administração")
+   - Coluna B: Curso SophiA (ex.: "ADMINISTRACAO")
+   - Coluna C: Tipo de Usuário (ex.: "Aluno")
+   - Coluna D: Importar? (SIM ou NÃO)
+
+5. Em **3. Nome da Biblioteca**, digite o nome exatamente como deve aparecer no SophiA (ex.: "Biblioteca Gama").
+
+6. Em **4. Data de Validade**, digite a data no formato DD/MM/AAAA (ex.: `19/02/2027`).
+
+7. Clique em **Processar e Baixar Arquivo TXT**. Aguarde a mensagem de sucesso.
+
+- Se tudo funcionar, o navegador fará o download do arquivo `Importacao_SophiA.txt`.
+- Se houver problema, aparecerá uma mensagem de erro em vermelho explicando (veja seção "Resolução de problemas").
+
+---
+
+## 🔍 Diferenças entre os modos (exemplo simples)
+
+Modo: Inclusão (cria novos registros)
+- Ordem das colunas no TXT (8 colunas):
+  1. Nome;
+  2. Matrícula;
+  3. Curso;
+  4. Tipo de usuário;
+  5. Biblioteca;
+  6. Contato residencial - E-mail;
+  7. Data de validade;
+  8. Inativo (0 = ativo).
+
+Modo: Atualização (atualiza validade / inativa)
+- Ordem das colunas no TXT (7 colunas):
+  1. Nome;
+  2. Matrícula;
+  3. Curso;
+  4. Tipo de usuário;
+  5. Biblioteca;
+  6. Data de validade (apenas se estiver matriculado);
+  7. Inativo (0 = ativo, 1 = inativo).
+
+Observação: a ordem é importante — siga exatamente como o SophiA exige. 🔁
+
+---
+
+## 🧾 Formato do arquivo gerado
+
+- Nome: `Importacao_SophiA.txt`
+- Codificação: UTF-8 (com BOM) — para evitar problemas de acentuação
+- Separador: ponto e vírgula (`;`)
+- Fim de linha: CRLF (compatível com sistemas do SophiA)
+- Sem cabeçalho — somente linhas de dados
+
+---
+
+## ❌ Mensagens de erro comuns e como resolver
+
+- "Coluna 'Curso' não encontrada" → Abra a planilha do SUAP e verifique se a coluna existe e está com o nome correto.
+- "Coluna 'Situação' não encontrada" (aparece no modo Atualização) → Use uma exportação do SUAP que inclua a coluna Situação (ex.: Matrículado / Trancado / Evasão).
+- "Nenhum aluno atendeu aos critérios" → Verifique se na planilha de referência a coluna D está marcada como "SIM" para os cursos que você quer importar.
+
+Se uma mensagem não ficar clara, copie o texto e procure um colega mais experiente ou peça auxílio ao suporte local. 💬
+
+---
+
+## 🔐 Privacidade e segurança
+
+- Todo o processamento é feito no seu navegador — nada é enviado para a internet.
+- Ainda assim, trate os arquivos com cuidado: contêm dados pessoais (e-mail, matrícula, nome).
+- Apague arquivos temporários e limpe o histórico do navegador quando necessário.
+
+---
+
+## 💡 Dicas práticas para evitar erros
+
+- Sempre mantenha um backup das planilhas originais antes de processar.
+- Faça um teste com poucas linhas (por exemplo: 5 alunos) para confirmar que o arquivo TXT gerado está correto antes de processar a base inteira.
+- Use a planilha de referência como controle: marque apenas "SIM" nos cursos que realmente deseja importar.
+
+---
+
+## 🧰 Exemplo rápido (mini-fluxo)
+
+1. Exportar alunos no SUAP com filtros: Ano de ingresso = ano atual; Situação = Matriculado; Campus = X.
+2. Abrir a planilha de referência e confirmar que os cursos estão mapeados e com "SIM" onde necessário.
+3. Abrir `index.html`, selecionar arquivos, preencher Biblioteca e Data, processar, baixar TXT.
+4. Abrir o TXT em um editor de texto e conferir as primeiras linhas antes de importar no SophiA.
+
+---
+
+## 📎 Precisa de ajuda? (quem contatar)
+
+- Consulte o manual local da sua biblioteca ou o colega responsável por sistemas.
+- Se sua instituição tiver suporte de TI/SEI, encaminhe o arquivo gerado e descreva o problema.
+
+---
+
+## 📝 Licença
+
+MIT — fique à vontade para adaptar a ferramenta às suas necessidades.
+
+---
+
+Se quiser, eu posso:
+- Adicionar uma planilha de referência de exemplo no repositório (arquivo `.xlsx`). 📄
+- Incluir capturas de tela passo a passo no README. 🖼️
+- Inserir um pequeno GIF demonstrando o fluxo (recomendado para treinamentos). 🎞️
+
+Diga qual dessas opções prefere que eu faça em seguida.
