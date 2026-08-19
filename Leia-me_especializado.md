@@ -1,4 +1,4 @@
-# 📘 README Especializado — Ferramenta SUAP → SophiA
+# 📘 Leia-me Especializado — Ferramenta SUAP → SophiA
 
 Este documento é destinado a bibliotecários com familiaridade em informática (intermediário/avançado) que desejam entender todos os pormenores técnicos da ferramenta, como ela processa dados, suas limitações e como estendê-la. Inclui explicações sobre o código presente em `index.html`, formato de entrada/saída, tratamento de dados, sugestões de melhoria e dicas de depuração.
 
