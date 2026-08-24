@@ -1,6 +1,6 @@
 # 📚 Ferramenta de importação em lote SUAP → SophiA
 
-> Uma pequena ferramenta que roda no navegador para transformar planilhas exportadas do SUAP em um arquivo .TXT pronto para importação no sistema SophiA — pensada para bibliotecários e auxiliares que precisam atualizar/adicionar cadastros em lote, sem precisar programar. ✅
+> Uma pequena ferramenta que roda no navegador para transformar planilhas exportadas do SUAP em um arquivo .TXT pronto para importação no sistema SophiA — pensada para bibliotecários e auxiliares que precisam atualizar/adicionar cadastros em lote, sem precisar programar. (feito pela IA Copilot embutido no Github e adaptador por Daniel R.G.) ✅
 
 ---
 
