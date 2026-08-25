@@ -169,12 +169,3 @@ Se uma mensagem não ficar clara, copie o texto e procure um colega mais experie
 ## 📝 Licença
 
 MIT — fique à vontade para adaptar a ferramenta às suas necessidades.
-
----
-
-Se quiser, eu posso:
-- Adicionar uma planilha de referência de exemplo no repositório (arquivo `.xlsx`). 📄
-- Incluir capturas de tela passo a passo no README. 🖼️
-- Inserir um pequeno GIF demonstrando o fluxo (recomendado para treinamentos). 🎞️
-
-Diga qual dessas opções prefere que eu faça em seguida.
