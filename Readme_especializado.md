@@ -203,8 +203,4 @@ A: Sim, apenas as primeiras quatro colunas são usadas — colunas extras são i
 
 ## ⚖️ Licença
 
-MIT — veja o arquivo LICENSE (ou adicione um se ainda não existir).
-
----
-
-Se quiser, eu já crio no repositório os exemplos (`examples/ref_example.xlsx`, `examples/suap_sample.xlsx`) e adiciono scripts de verificação básicos (um script JS modularizado) para facilitar testes automatizados. Diga quais itens quer que eu adicione a seguir.
+MIT — veja o arquivo LICENSE (ou adicione um se ainda não existir). 
