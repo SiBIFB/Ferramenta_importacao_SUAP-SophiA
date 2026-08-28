@@ -4,6 +4,11 @@
 
 ---
 
+Vídeo tutorial deste passo-a-passo (apenas disponível aos servidores do IFB):
+https://drive.google.com/file/d/1bKe3htuVONPZykqGuQbz3oQfGiwIAgRt/view?usp=drive_link
+
+---
+
 ## 🎯 Objetivo
 
 Gerar, localmente no navegador, um arquivo de importação (.TXT) formatado para o SophiA a partir de duas planilhas:
