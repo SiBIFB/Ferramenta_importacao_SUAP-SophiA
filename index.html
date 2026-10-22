@@ -290,7 +290,12 @@
 
                         let nome = String(servidor[colNome] || '').replace(/;/g, ',');
                         let matricula = String(servidor[colMatricula] || '').replace(/;/g, ',');
-                        let email = String(servidor[colEmail] || '').replace(/;/g, ',');
+                        let email = String(servidor[colEmail] || '').trim().replace(/;/g, ',');
+                        
+                        if (!email) {
+                            email = `${matricula}@ifb.edu.br`;
+                        }
+
                         let cargoStr = normalizeStr(servidor[colCargo] || '');
                         let situacaoStr = normalizeStr(servidor[colSituacao] || '');
                         let ativoStr = normalizeStr(servidor[colAtivo] || '');
