@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ferramenta de importação em lote SUAP-SophiA</title>
-    <!-- Tailwind CSS para estilização moderna e responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SheetJS (xlsx) para leitura e escrita de planilhas locais no navegador -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
@@ -25,7 +23,6 @@
         </div>
 
         <div class="p-8">
-            <!-- Link de Orientações Detalhadas -->
             <div class="flex justify-end mb-6">
                 <a href="https://github.com/SiBIFB/Ferramenta_importacao_SUAP-SophiA/blob/main/Readme.md" target="_blank" rel="noopener noreferrer" 
                    class="inline-flex items-center text-[#009660] hover:text-[#007a4e] font-medium transition-colors text-sm hover:underline">
@@ -39,46 +36,43 @@
             <form id="processorForm" class="space-y-6">
                 <!-- Modo de Operação -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Modo de Operação</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">1. Modo de Operação</label>
                     <select id="modoOperacao" class="block w-full border border-gray-300 rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#009660] bg-white">
                         <option value="inclusao">Apenas Inclusão (Novos Alunos)</option>
                         <option value="atualizacao">Atualização (Alunos Existentes)</option>
+                        <option value="servidores">Inclusão e atualização (Servidores)</option>
                     </select>
-                    <p class="text-xs text-gray-400 mt-1">Escolha se deseja importar apenas os novos matriculados, ou se deseja atualizar as validades e inativar evasões na base existente.</p>
                 </div>
 
                 <!-- Arquivo 1: Planilha do SUAP -->
                 <div>
-                    <label id="labelSuapFile" class="block text-sm font-medium text-gray-700 mb-2">1. Planilha de Matriculados (SUAP)</label>
-                    <input type="file" id="suapFile" accept=".xls,.xlsx" required
+                    <label id="labelSuapFile" class="block text-sm font-medium text-gray-700 mb-2">2. Planilha de Origem (SUAP)</label>
+                    <input type="file" id="suapFile" accept=".xls,.xlsx,.csv" required
                         class="block w-full text-sm text-gray-500
                         file:mr-4 file:py-2 file:px-4
                         file:rounded-md file:border-0
                         file:text-sm file:font-semibold
                         file:bg-emerald-50 file:text-[#009660]
                         hover:file:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-[#009660] rounded-md border border-gray-300 p-2">
-                    <p id="filterHelpSuap" class="text-xs text-gray-500 mt-2 font-medium">Planilha advinda de exportação com os seguintes filtros ativados na pesquisa de Alunos no SUAP:<br>Ano de Ingresso = ano vigente ; Período de Ingresso = período vigente ; Situação = Matriculado ; Campus = Campus da Biblioteca</p>
+                    <p id="filterHelpSuap" class="text-xs text-gray-500 mt-2 font-medium">Planilha de Alunos: Ano/Período vigente, Situação = Matriculado.</p>
                 </div>
 
                 <!-- Arquivo 2: Planilha de Referência -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">2. Lista de Cursos e Tipos de Usuários</label>
-                    <input type="file" id="refFile" accept=".xlsx" required
+                <div id="containerRefFile" class="transition-opacity duration-300">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">3. Dicionário de Cursos (Excel)</label>
+                    <input type="file" id="refFile" accept=".xls,.xlsx" required
                         class="block w-full text-sm text-gray-500
                         file:mr-4 file:py-2 file:px-4
                         file:rounded-md file:border-0
                         file:text-sm file:font-semibold
                         file:bg-emerald-50 file:text-[#009660]
-                        hover:file:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-[#009660] rounded-md border border-gray-300 p-2">
-                    <p class="text-xs text-gray-400 mt-1 flex flex-col gap-1">
-                        <span><a href="https://docs.google.com/spreadsheets/d/1w8KSnbJsizlbGHb66iPgCNiHFL3oDk3O/edit?usp=sharing&ouid=100505125267656218120&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer" class="text-[#009660] hover:text-[#007a4e] hover:underline font-medium transition-colors">Ex: Lista cursos e Tipo usuário Biblioteca X.xlsx</a></span>
-                        <span>(Colunas esperadas: A=Curso SUAP, B=Curso SophiA, C=Tipo de Usuário, D=Importar? (SIM/NÃO))</span>
-                    </p>
+                        hover:file:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-[#009660] rounded-md border border-gray-300 p-2 disabled:opacity-50 disabled:bg-gray-100">
+                    <p class="text-xs text-gray-400 mt-1">Colunas necessárias: A=Curso SUAP, B=Curso SophiA, C=Tipo de Usuário, D=Importar? (SIM/NÃO)</p>
                 </div>
 
                 <!-- Campo de Seleção: Nome da Biblioteca -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">3. Nome da Biblioteca</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">4. Nome da Biblioteca</label>
                     <select id="nomeBiblioteca" required
                         class="block w-full border border-gray-300 rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#009660] bg-white">
                         <option value="" disabled selected>Selecione a biblioteca...</option>
@@ -93,22 +87,19 @@
                         <option value="Biblioteca São Sebastião">Biblioteca São Sebastião</option>
                         <option value="Biblioteca Taguatinga">Biblioteca Taguatinga</option>
                     </select>
-                    <p class="text-xs text-gray-400 mt-1">Selecione a sua biblioteca para garantir a padronização exata no cadastro do SophiA.</p>
                 </div>
 
                 <!-- Campo de Texto: Data de Validade -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">4. Data de Validade</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">5. Data de Validade</label>
                     <input type="date" id="dataValidade" required
                         class="block w-full border border-gray-300 rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#009660]">
-                    <p class="text-xs text-gray-400 mt-1">Data de expiração do cadastro aplicada aos usuários ativos.</p>
                 </div>
 
                 <button type="submit" id="submitBtn" class="w-full bg-[#009660] text-white font-bold py-3 px-4 rounded-md hover:bg-[#007a4e] transition duration-300 flex justify-center items-center">
                     <span>Processar e Baixar Arquivo TXT</span>
                 </button>
 
-                <!-- Caixa de mensagens para erros ou sucesso movida para baixo do botão -->
                 <div id="messageBox" class="hidden p-4 rounded-lg font-medium text-sm"></div>
             </form>
 
@@ -124,6 +115,9 @@
                 </p>
                 <p id="opcaoAtualizacao" class="hidden mb-3 bg-amber-200/50 p-2.5 rounded border border-amber-300/60 font-bold text-amber-900">
                     Opção de importação: Apenas atualizar existentes
+                </p>
+                <p id="opcaoServidores" class="hidden mb-3 bg-amber-200/50 p-2.5 rounded border border-amber-300/60 font-bold text-amber-900">
+                    Opção de importação: Incluir novos e atualizar existentes
                 </p>
 
                 <p>A ordem dos campos na ferramenta de importação do sistema SophiA deve ser <strong>obrigatoriamente</strong> a seguinte para o modo selecionado:</p>
@@ -150,19 +144,22 @@
                     <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">6. Data de validade;</div>
                     <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">7. Inativo.</div>
                 </div>
+
+                <!-- Lista para Servidores -->
+                <div id="listaServidores" class="hidden mt-3 bg-amber-100/80 p-3 rounded text-amber-900 border border-amber-200/50 text-sm font-mono font-medium flex flex-col gap-2">
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">1. Nome;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">2. Matrícula;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">3. Tipo de usuário;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">4. Biblioteca;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">5. E-mail;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">6. Data de validade;</div>
+                    <div class="bg-white px-3 py-2 rounded shadow-sm border border-amber-100">7. Inativo.</div>
+                </div>
             </div>
-        </div>
-        
-        <div class="bg-gray-50 p-4 border-t border-gray-200 text-xs text-gray-500">
-            <strong>O que o sistema fará:</strong> Filtra apenas os cursos marcados com "SIM" na 4ª coluna da planilha de referência. 
-            <span id="explicacaoInclusao"><strong>No modo Inclusão:</strong> Cria o arquivo contendo o e-mail do aluno, preenche a validade informada no formulário e define a situação como ativa (0).</span>
-            <span id="explicacaoAtualizacao" class="hidden"><strong>No modo Atualização:</strong> Analisa a base geral do SUAP. Oculta o e-mail no arquivo TXT para evitar sobreposições no SophiA (7 colunas). Apenas alunos com a situação exata de 'Matriculado' recebem a nova Data de Validade e status '0' (Ativo). Todas as demais situações, incluindo 'Transferido internamente', ficam com a validade em branco e status '1' (Inativo).</span>
-            <br><br><strong>O resultado será um arquivo .TXT, codificado em UTF-8, separado por ponto e vírgula e sem cabeçalho.</strong>
         </div>
     </div>
 
     <script>
-        // Função utilitária para ler o arquivo como ArrayBuffer (necessário para o SheetJS)
         function readFileAsArrayBuffer(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -172,43 +169,58 @@
             });
         }
 
-        // Função auxiliar para normalizar texto e evitar quebra de strings (remove espaços extras e capitaliza)
         const normalizeStr = (str) => {
             if (str === null || str === undefined) return "";
             return String(str).trim().replace(/\s+/g, ' ').toUpperCase();
         };
 
-        // Função para exibir mensagens na interface
         function showMessage(msg, isError = false) {
             const box = document.getElementById('messageBox');
-            box.innerHTML = msg; // Permite HTML interno
-            box.className = `p-4 rounded-lg text-sm ${isError ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'}`;
+            box.innerHTML = msg;
+            box.className = `p-4 rounded-lg text-sm mt-4 ${isError ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'}`;
             box.classList.remove('hidden');
         }
 
-        // Alternar visualização da lista de campos dependendo do modo selecionado
         document.getElementById('modoOperacao').addEventListener('change', function(e) {
-            const isAtualizacao = e.target.value === 'atualizacao';
-            document.getElementById('listaInclusao').classList.toggle('hidden', isAtualizacao);
+            const modo = e.target.value;
+            
+            const isAtualizacao = modo === 'atualizacao';
+            const isServidores = modo === 'servidores';
+            const isInclusao = modo === 'inclusao';
+
+            // Alternar listas visuais SophiA
+            document.getElementById('listaInclusao').classList.toggle('hidden', !isInclusao);
             document.getElementById('listaAtualizacao').classList.toggle('hidden', !isAtualizacao);
+            document.getElementById('listaServidores').classList.toggle('hidden', !isServidores);
             
-            document.getElementById('opcaoInclusao').classList.toggle('hidden', isAtualizacao);
+            // Alternar mensagem de opção de importação
+            document.getElementById('opcaoInclusao').classList.toggle('hidden', !isInclusao);
             document.getElementById('opcaoAtualizacao').classList.toggle('hidden', !isAtualizacao);
+            document.getElementById('opcaoServidores').classList.toggle('hidden', !isServidores);
             
-            // Alternar texto explicativo do rodapé
-            document.getElementById('explicacaoInclusao').classList.toggle('hidden', isAtualizacao);
-            document.getElementById('explicacaoAtualizacao').classList.toggle('hidden', !isAtualizacao);
-            
-            // Alterar dinamicamente os textos do campo do arquivo 1
             const labelSuap = document.getElementById('labelSuapFile');
             const filterHelpSuap = document.getElementById('filterHelpSuap');
+            const refFileContainer = document.getElementById('containerRefFile');
+            const refFileInput = document.getElementById('refFile');
             
-            if (isAtualizacao) {
-                labelSuap.innerText = "1. Planilha Geral de Alunos (SUAP)";
-                filterHelpSuap.innerHTML = "Planilha advinda de exportação com os seguintes filtros ativados na pesquisa de Alunos no SUAP:<br>Ano de Ingresso = Todos ; Período de Ingresso = Todos ; Situação = Todos ; Campus = Campus da Biblioteca";
+            if (isServidores) {
+                labelSuap.innerText = "2. Planilha de Servidores (SUAP)";
+                filterHelpSuap.innerHTML = "Planilha advinda de exportação de Servidores no SUAP (deve conter a coluna 'Ativo').<br>O sistema deduzirá o Tipo de Usuário baseado no Cargo.";
+                refFileContainer.classList.add('opacity-40');
+                refFileInput.disabled = true;
+                refFileInput.required = false;
+            } else if (isAtualizacao) {
+                labelSuap.innerText = "2. Planilha Geral de Alunos (SUAP)";
+                filterHelpSuap.innerHTML = "Planilha advinda de exportação com os seguintes filtros ativados na pesquisa de Alunos no SUAP:<br>Ano/Período = Todos ; Situação = Todos";
+                refFileContainer.classList.remove('opacity-40');
+                refFileInput.disabled = false;
+                refFileInput.required = true;
             } else {
-                labelSuap.innerText = "1. Planilha de Matriculados (SUAP)";
-                filterHelpSuap.innerHTML = "Planilha advinda de exportação com os seguintes filtros ativados na pesquisa de Alunos no SUAP:<br>Ano de Ingresso = ano vigente ; Período de Ingresso = período vigente ; Situação = Matriculado ; Campus = Campus da Biblioteca";
+                labelSuap.innerText = "2. Planilha de Matriculados (SUAP)";
+                filterHelpSuap.innerHTML = "Planilha advinda de exportação com os seguintes filtros ativados na pesquisa de Alunos no SUAP:<br>Ano de Ingresso = ano vigente ; Período = vigente ; Situação = Matriculado";
+                refFileContainer.classList.remove('opacity-40');
+                refFileInput.disabled = false;
+                refFileInput.required = true;
             }
         });
 
@@ -222,140 +234,171 @@
             document.getElementById('messageBox').classList.add('hidden');
 
             try {
-                // Obtendo os valores do formulário
                 const modoOperacao = document.getElementById('modoOperacao').value;
                 const suapFile = document.getElementById('suapFile').files[0];
-                const refFile = document.getElementById('refFile').files[0];
                 const nomeBiblioteca = document.getElementById('nomeBiblioteca').value.trim();
                 const validadeInput = document.getElementById('dataValidade').value;
 
-                // Formatar a data (que vem como AAAA-MM-DD do calendário nativo) para o formato SophiA (DD/MM/AAAA)
                 let dataValidade = "";
                 if (validadeInput) {
                     const partes = validadeInput.split('-');
                     if (partes.length === 3) {
                         dataValidade = `${partes[2]}/${partes[1]}/${partes[0]}`;
-                        const ano = parseInt(partes[0], 10);
-                        if (ano < 2000 || ano > 9999) {
-                            throw new Error("O ano selecionado na data de validade parece inválido. Verifique o calendário.");
-                        }
                     }
-                } else {
-                    throw new Error("A data de validade é obrigatória.");
                 }
 
-                // 1. Ler e processar a planilha de referência (Dicionário)
-                const refBuffer = await readFileAsArrayBuffer(refFile);
-                const refWorkbook = XLSX.read(refBuffer, { type: 'array' });
-                const refSheet = refWorkbook.Sheets[refWorkbook.SheetNames[0]];
-                
-                const matrizDic = XLSX.utils.sheet_to_json(refSheet, { header: 1 });
-                
-                // 2. Ler e processar a planilha do SUAP
+                // Leitura do SUAP
                 const suapBuffer = await readFileAsArrayBuffer(suapFile);
                 const suapWorkbook = XLSX.read(suapBuffer, { type: 'array' });
                 const suapSheet = suapWorkbook.Sheets[suapWorkbook.SheetNames[0]];
                 const matrizSuap = XLSX.utils.sheet_to_json(suapSheet, { header: 1 });
-
-                const dicionario = {};
-                for (let i = 1; i < matrizDic.length; i++) {
-                    const row = matrizDic[i];
-                    if (row.length > 0) {
-                        const cursoSUAP = normalizeStr(row[0]);
-                        const cursoSophiA = row[1] || "";
-                        const tipo = row[2] || "";
-                        const importarStr = normalizeStr(row[3]); 
-                        
-                        if (cursoSUAP) {
-                            dicionario[cursoSUAP] = {
-                                cursoSophiA: cursoSophiA,
-                                tipo: tipo,
-                                importar: (importarStr === 'SIM')
-                            };
-                        }
-                    }
-                }
-
-                // Identificar as colunas na planilha do SUAP
-                const cabecalhoSuap = matrizSuap[0];
-                let colNome = -1, colMatricula = -1, colCurso = -1, colEmail = -1, colSituacao = -1;
-
-                for (let c = 0; c < cabecalhoSuap.length; c++) {
-                    let text = normalizeStr(cabecalhoSuap[c]);
-                    if (text === 'NOME' || text === 'NOME DO ALUNO') colNome = c;
-                    else if (text === 'MATRÍCULA' || text === 'MATRICULA') colMatricula = c;
-                    else if (text === 'CURSO') colCurso = c;
-                    else if (text === 'E-MAIL PESSOAL' || text === 'EMAIL PESSOAL') colEmail = c;
-                    else if (text === 'SITUAÇÃO' || text === 'SITUACAO') colSituacao = c;
-                }
-
-                if (colNome === -1 || colMatricula === -1 || colCurso === -1) {
-                    throw new Error("Não foi possível encontrar as colunas Nome, Matrícula ou Curso na planilha do SUAP. Verifique o arquivo original.");
-                }
-
-                // No modo inclusão, o e-mail pessoal é obrigatório
-                if (modoOperacao === 'inclusao' && colEmail === -1) {
-                    throw new Error("Não foi possível encontrar a coluna exata 'E-mail Pessoal' na planilha do SUAP. Esta coluna é obrigatória no modo inclusão.");
-                }
-
+                
                 let linhasParaExportar = [];
                 let cont = 0;
 
-                for (let r = 1; r < matrizSuap.length; r++) {
-                    const aluno = matrizSuap[r];
-                    if (!aluno || aluno.length === 0 || !aluno[colCurso]) continue;
-
-                    const searchKey = normalizeStr(aluno[colCurso]);
-                    const infoDic = dicionario[searchKey];
-
-                    if (!infoDic || !infoDic.importar) {
-                        continue;
+                // Lógica para Servidores
+                if (modoOperacao === 'servidores') {
+                    // Encontrar cabeçalho
+                    let idxCabecalho = 0;
+                    for (let i = 0; i < Math.min(10, matrizSuap.length); i++) {
+                        if (matrizSuap[i].some(cell => typeof cell === 'string' && (cell.toUpperCase().includes('MATRÍCULA') || cell.toUpperCase().includes('MATRICULA')))) {
+                            idxCabecalho = i;
+                            break;
+                        }
                     }
 
-                    let nome = String(aluno[colNome] || '').replace(/;/g, ',');
-                    let matricula = String(aluno[colMatricula] || '').replace(/;/g, ',');
-                    let email = String(aluno[colEmail] || '').replace(/;/g, ',');
-                    let situacao = normalizeStr(aluno[colSituacao] || '');
-                    
-                    let cursoFormatado = String(infoDic.cursoSophiA).replace(/;/g, ',');
-                    let tipoFormatado = String(infoDic.tipo).replace(/;/g, ',');
-                    let bibFormatada = String(nomeBiblioteca).replace(/;/g, ',');
+                    const cabecalho = matrizSuap[idxCabecalho];
+                    let colNome = -1, colMatricula = -1, colEmail = -1, colCargo = -1, colAtivo = -1;
 
-                    let linha = "";
+                    for (let c = 0; c < cabecalho.length; c++) {
+                        let text = normalizeStr(cabecalho[c]);
+                        if (text === 'NOME') colNome = c;
+                        else if (text === 'MATRÍCULA' || text === 'MATRICULA') colMatricula = c;
+                        else if (text === 'E-MAIL PARA CONTATO' || text === 'EMAIL PARA CONTATO') colEmail = c;
+                        else if (text === 'CARGO') colCargo = c;
+                        else if (text === 'ATIVO') colAtivo = c;
+                    }
 
-                    if (modoOperacao === 'inclusao') {
-                        linha = `${nome};${matricula};${cursoFormatado};${tipoFormatado};${bibFormatada};${email};${dataValidade};0\r\n`;
-                        linhasParaExportar.push(linha);
-                        cont++;
-                    } 
-                    else if (modoOperacao === 'atualizacao') {
-                        let dataValFinal = "";
-                        let inativoFinal = "1";
+                    if (colNome === -1 || colMatricula === -1 || colCargo === -1 || colAtivo === -1) {
+                        throw new Error("Colunas obrigatórias não encontradas. Verifique se o relatório contém 'Nome', 'Matrícula', 'Cargo' e 'Ativo'.");
+                    }
 
-                        if (situacao === 'MATRICULADO') {
-                            dataValFinal = dataValidade;
-                            inativoFinal = "0";
+                    for (let r = idxCabecalho + 1; r < matrizSuap.length; r++) {
+                        const servidor = matrizSuap[r];
+                        if (!servidor || servidor.length === 0 || !servidor[colNome]) continue;
+
+                        let nome = String(servidor[colNome] || '').replace(/;/g, ',');
+                        let matricula = String(servidor[colMatricula] || '').replace(/;/g, ',');
+                        let email = String(servidor[colEmail] || '').replace(/;/g, ',');
+                        let cargoStr = normalizeStr(servidor[colCargo] || '');
+                        let ativoStr = normalizeStr(servidor[colAtivo] || '');
+                        
+                        let tipoUsuario = cargoStr.includes('PROFESSOR') ? 'Docente' : 'Técnico-administrativo';
+                        let bibFormatada = String(nomeBiblioteca).replace(/;/g, ',');
+
+                        let dtFmt = "";
+                        let inativoVal = "1";
+                        
+                        if (ativoStr === 'SIM') {
+                            dtFmt = dataValidade;
+                            inativoVal = "0";
                         }
 
-                        linha = `${nome};${matricula};${cursoFormatado};${tipoFormatado};${bibFormatada};${dataValFinal};${inativoFinal}\r\n`;
+                        // Ordem: Nome;Matrícula;Tipo de Usuário;Biblioteca;E-mail;Data de validade;Inativo
+                        let linha = `${nome};${matricula};${tipoUsuario};${bibFormatada};${email};${dtFmt};${inativoVal}\r\n`;
                         linhasParaExportar.push(linha);
                         cont++;
+                    }
+                } 
+                // Lógica para Alunos (Inclusão ou Atualização)
+                else {
+                    const refFile = document.getElementById('refFile').files[0];
+                    if (!refFile) throw new Error("O Dicionário de Cursos é obrigatório para este modo.");
+                    
+                    const refBuffer = await readFileAsArrayBuffer(refFile);
+                    const refWorkbook = XLSX.read(refBuffer, { type: 'array' });
+                    const refSheet = refWorkbook.Sheets[refWorkbook.SheetNames[0]];
+                    const matrizDic = XLSX.utils.sheet_to_json(refSheet, { header: 1 });
+
+                    const dicionario = {};
+                    for (let i = 1; i < matrizDic.length; i++) {
+                        const row = matrizDic[i];
+                        if (row.length > 0 && row[0]) {
+                            dicionario[normalizeStr(row[0])] = {
+                                cursoSophiA: row[1] || "",
+                                tipo: row[2] || "",
+                                importar: (normalizeStr(row[3]) === 'SIM')
+                            };
+                        }
+                    }
+
+                    let idxCabecalho = 0;
+                    for (let i = 0; i < Math.min(10, matrizSuap.length); i++) {
+                        if (matrizSuap[i].some(cell => typeof cell === 'string' && (cell.toUpperCase().includes('MATRÍCULA') || cell.toUpperCase().includes('MATRICULA')))) {
+                            idxCabecalho = i;
+                            break;
+                        }
+                    }
+
+                    const cabecalhoSuap = matrizSuap[idxCabecalho];
+                    let colNome = -1, colMatricula = -1, colCurso = -1, colEmail = -1, colSituacao = -1;
+
+                    for (let c = 0; c < cabecalhoSuap.length; c++) {
+                        let text = normalizeStr(cabecalhoSuap[c]);
+                        if (text === 'NOME' || text === 'NOME DO ALUNO') colNome = c;
+                        else if (text === 'MATRÍCULA' || text === 'MATRICULA') colMatricula = c;
+                        else if (text === 'CURSO') colCurso = c;
+                        else if (text === 'E-MAIL PESSOAL' || text === 'EMAIL PESSOAL') colEmail = c;
+                        else if (text === 'SITUAÇÃO' || text === 'SITUACAO') colSituacao = c;
+                    }
+
+                    if (colNome === -1 || colMatricula === -1 || colCurso === -1) {
+                        throw new Error("Não foi possível encontrar as colunas Nome, Matrícula ou Curso na planilha do SUAP.");
+                    }
+                    if (modoOperacao === 'inclusao' && colEmail === -1) {
+                        throw new Error("Não foi possível encontrar a coluna 'E-mail Pessoal'. Ela é obrigatória no modo de inclusão de alunos.");
+                    }
+
+                    for (let r = idxCabecalho + 1; r < matrizSuap.length; r++) {
+                        const aluno = matrizSuap[r];
+                        if (!aluno || aluno.length === 0 || !aluno[colCurso]) continue;
+
+                        const infoDic = dicionario[normalizeStr(aluno[colCurso])];
+                        if (!infoDic || !infoDic.importar) continue;
+
+                        let nome = String(aluno[colNome] || '').replace(/;/g, ',');
+                        let matricula = String(aluno[colMatricula] || '').replace(/;/g, ',');
+                        let email = String(aluno[colEmail] || '').replace(/;/g, ',');
+                        let situacao = normalizeStr(aluno[colSituacao] || '');
+                        
+                        let cursoFmt = String(infoDic.cursoSophiA).replace(/;/g, ',');
+                        let tipoFmt = String(infoDic.tipo).replace(/;/g, ',');
+                        let bibFmt = String(nomeBiblioteca).replace(/;/g, ',');
+
+                        if (modoOperacao === 'inclusao') {
+                            linhasParaExportar.push(`${nome};${matricula};${cursoFmt};${tipoFmt};${bibFmt};${email};${dataValidade};0\r\n`);
+                            cont++;
+                        } else if (modoOperacao === 'atualizacao') {
+                            let dtFmt = situacao === 'MATRICULADO' ? dataValidade : "";
+                            let inativo = situacao === 'MATRICULADO' ? "0" : "1";
+                            linhasParaExportar.push(`${nome};${matricula};${cursoFmt};${tipoFmt};${bibFmt};${dtFmt};${inativo}\r\n`);
+                            cont++;
+                        }
                     }
                 }
 
                 if (cont === 0) {
-                    throw new Error("Nenhum aluno foi processado. Verifique se os cursos da planilha do SUAP batem exatamente com os cursos que possuem a palavra 'SIM' no dicionário de referência.");
+                    throw new Error("Nenhum registro foi processado. Verifique as configurações e os dados inseridos.");
                 }
 
-                // 3. Divisão inteligente do arquivo para respeitar o limite de 1MB do SophiA
-                const MAX_BYTES = 950 * 1024; // 950 KB (margem de segurança)
+                // Divisão em partes de ~950KB
+                const MAX_BYTES = 950 * 1024;
                 let partesTxt = [];
                 let txtAtual = "";
                 let tamanhoAtual = 0;
 
                 for (let i = 0; i < linhasParaExportar.length; i++) {
                     const linha = linhasParaExportar[i];
-                    // Medindo o tamanho da string convertida em UTF-8 (caracteres acentuados ocupam mais bytes)
                     const tamanhoLinha = new Blob([linha]).size;
 
                     if (tamanhoAtual + tamanhoLinha > MAX_BYTES && txtAtual !== "") {
@@ -368,19 +411,17 @@
                     }
                 }
                 
-                if (txtAtual !== "") {
-                    partesTxt.push(txtAtual);
-                }
+                if (txtAtual !== "") partesTxt.push(txtAtual);
 
-                // Dispara os downloads sequenciais sem BOM (Byte Order Mark)
+                // Download arquivos gerados
                 partesTxt.forEach((parte, index) => {
                     setTimeout(() => {
                         const blob = new Blob([parte], { type: 'text/plain;charset=utf-8' });
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
-                        // Ajusta o nome do arquivo caso haja mais de 1 parte
-                        a.download = partesTxt.length > 1 ? `Importacao_SophiA_Parte${index + 1}.txt` : 'Importacao_SophiA.txt';
+                        let sufixo = modoOperacao === 'servidores' ? '_Servidores' : '';
+                        a.download = partesTxt.length > 1 ? `Importacao_SophiA${sufixo}_Parte${index + 1}.txt` : `Importacao_SophiA${sufixo}.txt`;
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
@@ -388,14 +429,10 @@
                     }, index * 500); 
                 });
 
-                let textoMensagem = `<strong>Sucesso!</strong><br>${cont} aluno(s) processado(s).`;
-                
+                let textoMensagem = `<strong>Sucesso!</strong><br>${cont} registro(s) processado(s).`;
                 if (partesTxt.length > 1) {
-                    textoMensagem += `<br><span style="font-size: 0.9em; margin-top: 10px; display: block; background: rgba(255,255,255,0.5); padding: 10px; border-radius: 4px;"><strong>Atenção:</strong> Devido ao limite de tamanho (1MB) exigido pelo sistema SophiA, o resultado foi dividido automaticamente em <strong>${partesTxt.length} arquivos TXT</strong>.<br><br>Os downloads iniciarão sozinhos. <em>Nota: Caso o navegador pergunte se você deseja permitir o download de múltiplos arquivos, basta aceitar.</em></span>`;
-                } else {
-                    textoMensagem += `<br>Arquivo TXT único gerado e baixado com sucesso!`;
+                    textoMensagem += `<br><span style="font-size: 0.9em; margin-top: 10px; display: block; background: rgba(255,255,255,0.5); padding: 10px; border-radius: 4px;">Dividido em <strong>${partesTxt.length} arquivos TXT</strong> devido ao limite de 1MB.</span>`;
                 }
-                
                 showMessage(textoMensagem, false);
 
             } catch (error) {
