@@ -268,7 +268,7 @@
                     }
 
                     const cabecalho = matrizSuap[idxCabecalho];
-                    let colNome = -1, colMatricula = -1, colEmail = -1, colCargo = -1, colAtivo = -1;
+                    let colNome = -1, colMatricula = -1, colEmail = -1, colCargo = -1, colAtivo = -1, colSituacao = -1;
 
                     for (let c = 0; c < cabecalho.length; c++) {
                         let text = normalizeStr(cabecalho[c]);
@@ -277,10 +277,11 @@
                         else if (text === 'E-MAIL PARA CONTATO' || text === 'EMAIL PARA CONTATO') colEmail = c;
                         else if (text === 'CARGO') colCargo = c;
                         else if (text === 'ATIVO') colAtivo = c;
+                        else if (text === 'SITUAÇÃO' || text === 'SITUACAO') colSituacao = c;
                     }
 
-                    if (colNome === -1 || colMatricula === -1 || colCargo === -1 || colAtivo === -1) {
-                        throw new Error("Colunas obrigatórias não encontradas. Verifique se o relatório contém 'Nome', 'Matrícula', 'Cargo' e 'Ativo'.");
+                    if (colNome === -1 || colMatricula === -1 || colCargo === -1 || colAtivo === -1 || colSituacao === -1) {
+                        throw new Error("Colunas obrigatórias não encontradas. Verifique se o relatório contém 'Nome', 'Matrícula', 'Cargo', 'Situação' e 'Ativo'.");
                     }
 
                     for (let r = idxCabecalho + 1; r < matrizSuap.length; r++) {
@@ -291,9 +292,16 @@
                         let matricula = String(servidor[colMatricula] || '').replace(/;/g, ',');
                         let email = String(servidor[colEmail] || '').replace(/;/g, ',');
                         let cargoStr = normalizeStr(servidor[colCargo] || '');
+                        let situacaoStr = normalizeStr(servidor[colSituacao] || '');
                         let ativoStr = normalizeStr(servidor[colAtivo] || '');
                         
-                        let tipoUsuario = cargoStr.includes('PROFESSOR') ? 'Docente' : 'Técnico-administrativo';
+                        let tipoUsuario = 'Técnico-administrativo';
+                        if (situacaoStr.includes('ESTAGIARIO') || situacaoStr.includes('ESTAGIÁRIO')) {
+                            tipoUsuario = 'Estagiário';
+                        } else if (cargoStr.includes('PROFESSOR')) {
+                            tipoUsuario = 'Docente';
+                        }
+                        
                         let bibFormatada = String(nomeBiblioteca).replace(/;/g, ',');
 
                         let dtFmt = "";
