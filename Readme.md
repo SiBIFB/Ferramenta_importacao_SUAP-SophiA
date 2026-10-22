@@ -81,7 +81,7 @@ Dica: mantenha cópias originais dos arquivos antes de processar. 🗂️
      - Observação: a ferramenta usará a coluna Situação para decidir quem permanece ativo e recebe nova data de validade.
 
    - Para o modo "Inclusão e atualização (Servidores)":
-     - Exportação de servidores do SUAP com as colunas relevantes, especialmente "Nome", "Matrícula", "Cargo" e "Ativo".
+     - Exportação de servidores do respectivo Campus do SUAP sem filtro, salvo o filtro Campus selecionado.
      - O sistema deduz automaticamente o tipo de usuário com base no cargo:
        - se o cargo contiver "PROFESSOR" → tipo de usuário: `Docente`
        - caso contrário → `Técnico-administrativo`
